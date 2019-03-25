@@ -21,14 +21,13 @@ public class CustomerService {
         try {
             List<Customer> customerList = new ArrayList<Customer>();
             String sql = "select * from customer";
-            conn = DatabaseHelper.getConnection();
-            return  DatabaseHelper.queryEntityList(Customer.class,sql,conn);
+            return  DatabaseHelper.queryEntityList(Customer.class,sql);
         } catch (Exception e) {
             LOGGER.error("execute sql error",e);
             return  null;
         }
         finally {
-            DatabaseHelper.closeConnection(conn);
+            DatabaseHelper.closeConnection();
         }
     }
     public Customer getCustomer(long id)

@@ -19,6 +19,8 @@ public class DatabaseHelper {
     private static final String USERNAME;
     private static final String PASSWORD;
     private static final QueryRunner QUERY_RUNNER = new QueryRunner();
+    private static final ThreadLocal<Connection> CONNECTION_HOLDER = new ThreadLocal<Connection>();
+
 
     static {
         Properties properties = PropsUtil.loadProps("config.properties");
@@ -36,7 +38,7 @@ public class DatabaseHelper {
 
     public static Connection getConnection()
     {
-        Connection conn = null;
+        Connection conn = CONNECTION_HOLDER.get();
         try {
             conn = DriverManager.getConnection(URL,USERNAME,PASSWORD);
         } catch (SQLException e) {
@@ -45,8 +47,9 @@ public class DatabaseHelper {
         return conn;
     }
 
-    public static void closeConnection(Connection conn)
+    public static void closeConnection()
     {
+        Connection conn = CONNECTION_HOLDER.get();
         try {
             if(conn != null)
             {
@@ -57,15 +60,15 @@ public class DatabaseHelper {
         }
     }
 
-    public static <T> List<T> queryEntityList(Class<T> entityClass, String sql,Connection conn, Object... params)
+    public static <T> List<T> queryEntityList(Class<T> entityClass, String sql,Object... params)
     {
         List<T> entityList = null;
         try {
-            entityList = QUERY_RUNNER.query(conn,sql,new BeanListHandler<T>(entityClass),params);
+            entityList = QUERY_RUNNER.query(getConnection(),sql,new BeanListHandler<T>(entityClass),params);
         } catch (SQLException e) {
             LOGGER.error("query list error",e);
         }finally {
-            closeConnection(conn);
+            closeConnection();
         }
         return entityList;
     }
