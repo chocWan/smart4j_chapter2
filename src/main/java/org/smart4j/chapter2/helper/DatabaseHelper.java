@@ -1,5 +1,7 @@
 package org.smart4j.chapter2.helper;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.slf4j.LoggerFactory;
 import org.smart4j.chapter2.service.CustomerService;
 import org.smart4j.chapter2.utils.PropsUtil;
@@ -7,6 +9,7 @@ import org.smart4j.chapter2.utils.PropsUtil;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 public class DatabaseHelper {
@@ -15,6 +18,7 @@ public class DatabaseHelper {
     private static final String URL;
     private static final String USERNAME;
     private static final String PASSWORD;
+    private static final QueryRunner QUERY_RUNNER = new QueryRunner();
 
     static {
         Properties properties = PropsUtil.loadProps("config.properties");
@@ -51,6 +55,19 @@ public class DatabaseHelper {
         } catch (SQLException e) {
             LOGGER.error("close connection erro",e);
         }
+    }
+
+    public static <T> List<T> queryEntityList(Class<T> entityClass, String sql,Connection conn, Object... params)
+    {
+        List<T> entityList = null;
+        try {
+            entityList = QUERY_RUNNER.query(conn,sql,new BeanListHandler<T>(entityClass),params);
+        } catch (SQLException e) {
+            LOGGER.error("query list error",e);
+        }finally {
+            closeConnection(conn);
+        }
+        return entityList;
     }
 
 }
