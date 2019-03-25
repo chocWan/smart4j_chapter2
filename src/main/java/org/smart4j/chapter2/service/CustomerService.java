@@ -17,9 +17,7 @@ public class CustomerService {
 
     public List<Customer> getCustomerList()
     {
-        Connection conn = null;
         try {
-            List<Customer> customerList = new ArrayList<Customer>();
             String sql = "select * from customer";
             return  DatabaseHelper.queryEntityList(Customer.class,sql);
         } catch (Exception e) {
