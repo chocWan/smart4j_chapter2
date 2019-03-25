@@ -30,7 +30,7 @@ public final class DatabaseHelper {
     private static final BasicDataSource DATA_SOURCE;
 
     static {
-        LOGGER = LoggerFactory.getLogger(CustomerService.class);
+        LOGGER = LoggerFactory.getLogger(DatabaseHelper.class);
         QUERY_RUNNER = new QueryRunner();
         CONNECTION_HOLDER = new ThreadLocal<Connection>();
 
