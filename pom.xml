@@ -50,11 +50,12 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.26</version>
         </dependency>
-        <!--MYSQL -->
+        <!-- MySQL -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.15</version>
+            <version>5.1.33</version>
+            <scope>runtime</scope>
         </dependency>
         <!-- Apache Commons Lang -->
         <dependency>
