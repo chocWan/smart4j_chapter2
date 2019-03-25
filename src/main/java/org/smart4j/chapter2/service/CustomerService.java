@@ -15,38 +15,41 @@ import java.util.logging.Logger;
 public class CustomerService {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
 
-    public List<Customer> getCustomerList()
-    {
-        try {
-            String sql = "select * from customer";
-            return  DatabaseHelper.queryEntityList(Customer.class,sql);
-        } catch (Exception e) {
-            LOGGER.error("execute sql error",e);
-            return  null;
-        }
-        finally {
-            DatabaseHelper.closeConnection();
-        }
+    /**
+     * 获取客户列表
+     */
+    public List<Customer> getCustomerList() {
+        String sql = "SELECT * FROM customer";
+        return DatabaseHelper.queryEntityList(Customer.class, sql);
     }
-    public Customer getCustomer(long id)
-    {
-        //TODO
-        return null;
+
+    /**
+     * 获取客户
+     */
+    public Customer getCustomer(long id) {
+        String sql = "SELECT * FROM customer WHERE id = ?";
+        return DatabaseHelper.queryEntity(Customer.class, sql, id);
     }
-    public boolean createCustomer(Map<String,Object> fieldMap)
-    {
-        //TODO
-        return false;
+
+    /**
+     * 创建客户
+     */
+    public boolean createCustomer(Map<String, Object> fieldMap) {
+        return DatabaseHelper.insertEntity(Customer.class, fieldMap);
     }
-    public boolean updateCustomer(long id,Map<String,Object> fieldMap)
-    {
-        //TODO
-        return false;
+
+    /**
+     * 更新客户
+     */
+    public boolean updateCustomer(long id, Map<String, Object> fieldMap) {
+        return DatabaseHelper.updateEntity(Customer.class, id, fieldMap);
     }
-    public boolean deleteCustomer(long id)
-    {
-        //TODO
-        return false;
+
+    /**
+     * 删除客户
+     */
+    public boolean deleteCustomer(long id) {
+        return DatabaseHelper.deleteEntity(Customer.class, id);
     }
 
 }

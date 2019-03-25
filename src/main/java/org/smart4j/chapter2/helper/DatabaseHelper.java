@@ -1,5 +1,6 @@
 package org.smart4j.chapter2.helper;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -9,6 +10,7 @@ import org.smart4j.chapter2.service.CustomerService;
 import org.smart4j.chapter2.utils.CollectionUtil;
 import org.smart4j.chapter2.utils.PropsUtil;
 
+import javax.activation.DataSource;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,22 +22,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class DatabaseHelper {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
-    private static final String DRIVER;
-    private static final String URL;
-    private static final String USERNAME;
-    private static final String PASSWORD;
-    private static final QueryRunner QUERY_RUNNER = new QueryRunner();
-    private static final ThreadLocal<Connection> CONNECTION_HOLDER = new ThreadLocal<Connection>();
+public final class DatabaseHelper {
 
+    private static final org.slf4j.Logger LOGGER;
+    private static final QueryRunner QUERY_RUNNER;
+    private static final ThreadLocal<Connection> CONNECTION_HOLDER;
+    private static final BasicDataSource DATA_SOURCE;
 
     static {
+        LOGGER = LoggerFactory.getLogger(CustomerService.class);
+        QUERY_RUNNER = new QueryRunner();
+        CONNECTION_HOLDER = new ThreadLocal<Connection>();
+
+
         Properties properties = PropsUtil.loadProps("config.properties");
-        DRIVER = properties.getProperty("jdbc.driver");
-        URL = properties.getProperty("jdbc.url");
-        USERNAME = properties.getProperty("jdbc.username");
-        PASSWORD = properties.getProperty("jdbc.password");
+        String DRIVER = properties.getProperty("jdbc.driver");
+        String URL = properties.getProperty("jdbc.url");
+        String USERNAME = properties.getProperty("jdbc.username");
+        String PASSWORD = properties.getProperty("jdbc.password");
+
+        DATA_SOURCE = new BasicDataSource();
+        DATA_SOURCE.setDriverClassName(DRIVER);
+        DATA_SOURCE.setUrl(URL);
+        DATA_SOURCE.setUsername(USERNAME);
+        DATA_SOURCE.setPassword(PASSWORD);
         try {
             Class.forName(DRIVER);
         }catch (ClassNotFoundException e)
@@ -48,9 +58,12 @@ public class DatabaseHelper {
     {
         Connection conn = CONNECTION_HOLDER.get();
         try {
-            conn = DriverManager.getConnection(URL,USERNAME,PASSWORD);
+            conn = DATA_SOURCE.getConnection();
         } catch (SQLException e) {
             LOGGER.error("get connection erro",e);
+            throw new RuntimeException(e);
+        }finally {
+            CONNECTION_HOLDER.set(conn);
         }
         return conn;
     }
